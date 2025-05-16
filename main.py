@@ -38,7 +38,7 @@ def _mapNamesToHashes(aDictionary):
 ###############################################################################
 if __name__ == '__main__':
     # check manifest and load if out of date
-    #manifest = DestinyManifest().update()
+    manifest = DestinyManifest().update()
     # build dictionaries of activity types and definitions
     activityTypeDict = _loadJsonFileIntoDictionary('./cache/DestinyActivityTypeDefinition')
     activityDefinitionDict = _loadJsonFileIntoDictionary('./cache/DestinyActivityDefinition')

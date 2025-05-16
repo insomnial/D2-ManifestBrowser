@@ -113,4 +113,3 @@ def GetActivityTypeNames():
     data = GetManifestDefinitions("DestinyActivityTypeDefinition")
     result = {str(data[k]["index"]): data[k]["displayProperties"]["name"] for k in data.keys() if "name" in data[k]["displayProperties"]}
     return result
-    # return ACTIVITY_NAMES
