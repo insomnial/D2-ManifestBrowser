@@ -102,14 +102,15 @@ def GetInventoryItemDefinitions():
 def GetClassDefinition():
     return CLASS_HASH
 
+
 def GetActivityNames():
     data = GetManifestDefinitions("DestinyActivityDefinition")
-
     result = {str(data[k]["hash"]): data[k]["displayProperties"]["name"] for k in data.keys()}
     return result
 
 
 def GetActivityTypeNames():
-    # data = GetManifestDefinitions("DestinyActivityTypeDefinition")
-    #result = {str(data[k]["index"]): data[k]["displayProperties"]["name"] for k in data.keys() if "name" in data[k]["displayProperties"]}
-    return ACTIVITY_NAMES
+    data = GetManifestDefinitions("DestinyActivityTypeDefinition")
+    result = {str(data[k]["index"]): data[k]["displayProperties"]["name"] for k in data.keys() if "name" in data[k]["displayProperties"]}
+    return result
+    # return ACTIVITY_NAMES
