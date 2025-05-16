@@ -82,11 +82,9 @@ if __name__ == '__main__':
         elif event == "OK":
             print("OK")
         elif event == "ac_type":
-            print(f"ac_type: {values[event]}")
-            print(f"mapActivityTypeNameToHash: {mapActivityTypeNameToHash[values[event]]}")
-            print(f"mapTypehashToActivityHash: {mapTypehashToActivityHash[mapActivityTypeNameToHash[values[event]]]}")
             filteredActivityHashes = mapTypehashToActivityHash[mapActivityTypeNameToHash[values[event]]]
             filteredActivityNames = [((activityDefinitionDict[item])['displayProperties'])['name'] for item in filteredActivityHashes]
+            filteredActivityNames = sorted(filteredActivityNames)
             itemString = json.dumps(activityTypeDict[mapActivityTypeNameToHash[values[event]]], indent=2)
             window["ml_type"].update(itemString)
             window["ml_definition"].update("") # reset the definition text when the type changes
