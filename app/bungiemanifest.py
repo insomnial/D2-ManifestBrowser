@@ -1,4 +1,4 @@
-import json, urllib.request, os, shutil
+import json, urllib.request, os, shutil, time
 
 from app.data.activities import ACTIVITY_NAMES
 from app.data.classhash import CLASS_HASH
@@ -15,12 +15,11 @@ class DestinyManifest():
 
     def update(self):
         self.CacheFolder = GetCacheFolder()
-        self.ActivityTypeNames = GetActivityTypeNames()
         self.VersionNumber = GetVersionNumber()
+        self.ActivityTypeNames = GetActivityTypeNames()
         self.ItemDefinitions = GetInventoryItemDefinitions()
         self.ActivityNames = GetActivityNames()
         self.ClassHash = GetClassDefinition()
-
         return self
     
 
@@ -35,7 +34,12 @@ def GetCacheFolder():
 def GetVersionNumber():
     print("Check version number")
     # get version from manifest file
-    manifestPaths = json.loads(urllib.request.urlopen(BUNGIE_API_BASE + "/Destiny2/Manifest/").read())["Response"]
+    try:
+        manifestPaths = json.loads(urllib.request.urlopen(BUNGIE_API_BASE + "/Destiny2/Manifest/").read())["Response"]
+    except:
+        print("Version check failed: cannot contact Destiny servers. Waiting for re-attempt.")
+        time.sleep(20)
+        GetVersionNumber()
     version = manifestPaths['version']
     cacheRoot = GetCacheFolder()
 
@@ -45,7 +49,7 @@ def GetVersionNumber():
         return
 
     # if version file does not exist or does not match
-    print("Version check failed, deleting cache")
+    print("Version out of date, deleting cache")
     # delete existing cache folder
     shutil.rmtree(cacheRoot, ignore_errors=True)
     print("Updating version")
@@ -55,6 +59,7 @@ def GetVersionNumber():
     # create new version file
     with open(file=versionFilePath, mode='w', encoding='utf-8') as f:
         f.write(version)
+    print("Version check passed: new file created.")
 
 
 def SaveToCache(aDefinition, aJsonBlob):
