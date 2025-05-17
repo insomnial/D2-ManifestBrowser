@@ -40,6 +40,7 @@ def GetVersionNumber():
         print("Version check failed: cannot contact Destiny servers. Waiting for re-attempt.")
         time.sleep(20)
         GetVersionNumber()
+        return
     version = manifestPaths['version']
     cacheRoot = GetCacheFolder()
 

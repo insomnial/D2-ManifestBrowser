@@ -7,14 +7,14 @@ import json
 # Functions
 #
 ###############################################################################
-def _loadJsonFileIntoDictionary(filePath):
+def _loadJsonFileIntoDictionary(filePath : str):
     # load json file into dictionary
     with open(filePath) as json_file:
         data = json.load(json_file)
         json_file.close()
     return data
 
-def _mapNamesToHashes(aDictionary):
+def _mapNamesToHashes(aDictionary : dict):
     # map names to hashes
     # get the name and hash from the json blob
     # return a dictionary of names to hashes
@@ -30,6 +30,15 @@ def _mapNamesToHashes(aDictionary):
     sortedKeys = sorted(nameHashDict.keys())
     return {name: nameHashDict[name] for name in sortedKeys}
 
+def _convertJsonToTree(aJson : dict, aTree : sg.TreeData):
+    for key in aJson.keys():
+        item = aJson[key]
+        if item is dict:
+            # TODO keep going with dictionaries
+            pass
+        # ( PARENT, KEY, TEXT, VALUE)
+        aTree.Insert("", key, key, item)
+        
 
 ###############################################################################
 #
@@ -57,18 +66,26 @@ if __name__ == '__main__':
             mapTypehashToActivityHash[activityTypeHash] = [] # create a new list for this type hash
         mapTypehashToActivityHash[activityTypeHash].append(str(activity['hash']))
 
-    # trim map to only have keys that are in their dictionary
-    # mapActivityTypeNameToHash = _trimDictionary(mapActivityTypeNameToHash, activityTypeDict)
-    # mapActivityDefinitionNameToHash = _trimDictionary(mapActivityDefinitionNameToHash, activityDefinitionDict)
+    treedata = sg.TreeData()
+
+    treedata.Insert("", '_A_', 'A', [1, 2, 3])
+    treedata.Insert("", '_B_', 'B', [4, 5, 6])
+    treedata.Insert("_A_", '_A1_', 'A1', ['can', 'be', 'anything'])
+    treedata.Insert("_B_", '_B1_', 'B1', ['can', 'be', 'anything'])
+    treedata.Insert("_A1_", '_A2_', 'A2', ['can', 'be', 'anything', 'even'])
 
     layout = [
         [
             sg.Combo([*mapActivityTypeNameToHash.keys()], enable_events=True, key="ac_type"),
             sg.Combo([*mapActivityDefinitionNameToHash.keys()], enable_events=True, key="ac_definition")
         ],
+        # [
+        #     sg.Multiline("Type", key="ml_type", size=(80,30)),
+        #     sg.Multiline("Definitions", key="ml_definition", size=(100,30))
+        # ],
         [
-            sg.Multiline("Type", key="ml_type", size=(80,30)),
-            sg.Multiline("Definitions", key="ml_definition", size=(120,30))
+            sg.Tree(treedata, key="tr_type", headings=["1", "2", "3", "4", "5"], auto_size_columns=True),
+            sg.Tree(treedata, key="tr_definition", headings=["1", "2", "3", "4", "5"], auto_size_columns=True)
         ],
         [sg.Button("Close", key="Close")]
     ]
@@ -86,12 +103,20 @@ if __name__ == '__main__':
             filteredActivityNames = [((activityDefinitionDict[item])['displayProperties'])['name'] for item in filteredActivityHashes]
             filteredActivityNames = sorted(filteredActivityNames)
             itemString = json.dumps(activityTypeDict[mapActivityTypeNameToHash[values[event]]], indent=2)
-            window["ml_type"].update(itemString)
-            window["ml_definition"].update("") # reset the definition text when the type changes
-            window["ac_definition"].update(value = '', values = [*filteredActivityNames]) # reset the definition combo when the type changes
+            print(itemString)
+            itemJson = activityTypeDict[mapActivityTypeNameToHash[values[event]]]
+            itemTree = _convertJsonToTree(itemJson, sg.TreeData())
+            window["tr_type"].update(itemTree)
+            # window["ml_type"].update(itemString)
+            # window["ml_definition"].update("") # reset the definition text when the type changes
+            # window["ac_definition"].update(value = '', values = [*filteredActivityNames]) # reset the definition combo when the type changes
         elif event == "ac_definition":
             itemString = json.dumps(activityDefinitionDict[mapActivityDefinitionNameToHash[values[event]]], indent=2)
-            window["ml_definition"].update(itemString)
+            print(itemString)
+            itemJson = activityDefinitionDict[mapActivityDefinitionNameToHash[values[event]]]
+            itemTree = _convertJsonToTree(itemTree, sg.TreeData())
+            window["tr_definition"].update(itemTree)
+            # window["ml_definition"].update(itemString)
         else:
             print(event, values)
     window.close()
